@@ -29,6 +29,7 @@ LOCK_FILE = os.path.join(BASE_DIR, ".lock")
 LOG_FILE = os.path.join(BASE_DIR, "claude-summary.log")
 
 MIN_MESSAGES = int(os.environ.get("CLAUDE_SUMMARY_MIN_MESSAGES", "4"))
+MODEL = os.environ.get("CLAUDE_SUMMARY_MODEL", "claude-sonnet-4-6")
 
 SUMMARY_PROMPT = """你是一个经验总结助手。分析以下 Claude Code 对话记录，提取关键经验。
 
@@ -283,7 +284,7 @@ def summarize_with_claude(conversation: str) -> str:
     prompt = SUMMARY_PROMPT + conversation
     try:
         result = subprocess.run(
-            ["claude", "-p", prompt],
+            ["claude", "-p", "--model", MODEL, prompt],
             capture_output=True, text=True, timeout=120
         )
         if result.returncode == 0:
@@ -719,6 +720,7 @@ def cli_status():
     print(f"  存储目录:     {BASE_DIR}")
     print(f"  队列中:       {queue_count} 个任务")
     print(f"  已总结:       {summarized_count} 个对话")
+    print(f"  总结模型:     {MODEL}")
     print(f"  正在处理:     {'是' if lock_active else '否'}")
     print(f"  今天是周一:   {'是' if is_monday() else '否'}")
 
